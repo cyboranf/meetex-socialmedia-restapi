@@ -22,8 +22,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/register")
-    public String createAnAccount(@Validated @ModelAttribute("user") User user,
-                                  BindingResult result, Model model) {
+    public String createAnAccount(@Validated @ModelAttribute("user") User user, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("user", user);
             return "register";

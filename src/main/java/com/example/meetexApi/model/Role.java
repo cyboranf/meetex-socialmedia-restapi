@@ -1,10 +1,10 @@
 package com.example.meetexApi.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
 
+import javax.persistence.*;
+
 @Entity
-@Table(name = "roles")
 @Data
 public class Role {
     @Id

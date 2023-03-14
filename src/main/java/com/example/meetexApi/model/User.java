@@ -1,9 +1,10 @@
 package com.example.meetexApi.model;
 
-import jakarta.persistence.*;
+
 import lombok.Data;
 import org.springframework.lang.Nullable;
 
+import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
 
@@ -28,11 +29,7 @@ public class User {
     private String password;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_friends",
-            joinColumns = {@JoinColumn(name = "user_id", unique = false)},
-            inverseJoinColumns = {@JoinColumn(name = "friend_id", unique = false)}
-    )
+    @JoinTable(name = "user_friends", joinColumns = {@JoinColumn(name = "user_id", unique = false)}, inverseJoinColumns = {@JoinColumn(name = "friend_id", unique = false)})
     @Nullable
     private List<User> friends;
 
@@ -46,8 +43,7 @@ public class User {
     private boolean logged;
     private boolean active;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
 }

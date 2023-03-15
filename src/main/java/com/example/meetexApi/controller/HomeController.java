@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
     @GetMapping("/welcome")
     public String welcomeHome() {
-        return "Hello in Meetex virtual world";
+        return "mainpage";
     }
 }

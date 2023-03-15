@@ -15,10 +15,10 @@ import java.util.Locale;
 @Configuration
 @ComponentScan(basePackages = {"com.example.meetexApi"})
 public class MeetexApiConfiguration implements WebMvcConfigurer {
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login");
-    }
+//    @Override
+//    public void addViewControllers(ViewControllerRegistry registry) {
+//        registry.addViewController("/login");
+//    }
 
     @Bean
     public ViewResolver viewResolver() {

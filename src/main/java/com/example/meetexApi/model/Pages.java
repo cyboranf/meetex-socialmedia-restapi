@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Pages {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private String name;
     @ManyToOne
     @Nullable

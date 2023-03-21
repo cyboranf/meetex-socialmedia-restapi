@@ -1,16 +1,16 @@
 package com.example.meetexApi.model;
 
-import lombok.Data;
-import org.springframework.lang.Nullable;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Data
-public class Activities {
+public class Community {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long activities_id;
+    @Column
+    private long id;
     @Column
     private String name;
 

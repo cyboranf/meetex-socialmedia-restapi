@@ -592,7 +592,7 @@
 
                     </div>
                     <div class="upper">
-                        <p class="title">your groups</p>
+                        <p class="title">your community</p>
                         <ul>
                             <li>
                                 <div class="basic">

@@ -5,6 +5,8 @@ import com.example.meetexApi.repository.PagesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class PagesService {
@@ -13,10 +15,16 @@ public class PagesService {
     public PagesService(PagesRepository pagesRepository) {
         this.pagesRepository = pagesRepository;
     }
+
     public Pages save(Pages pages) {
         return pagesRepository.save(pages);
     }
+
     public void delete(Pages pages) {
         pagesRepository.delete(pages);
+    }
+
+    public List<Pages> findAll() {
+        return pagesRepository.findAll();
     }
 }

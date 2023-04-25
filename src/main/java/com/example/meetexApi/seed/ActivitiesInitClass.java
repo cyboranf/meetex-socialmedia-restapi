@@ -1,4 +1,4 @@
-package com.example.meetexApi.init;
+package com.example.meetexApi.seed;
 
 import com.example.meetexApi.model.Activities;
 import com.example.meetexApi.service.ActivitiesService;

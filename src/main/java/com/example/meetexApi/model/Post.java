@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -21,8 +21,8 @@ public class Post {
     private String text;
 
     @Column
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate sendDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime sendDate;
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
@@ -36,6 +36,8 @@ public class Post {
     private int reactions;
 
     @Column
-    private int comCount;
+    private int commentCount;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 }

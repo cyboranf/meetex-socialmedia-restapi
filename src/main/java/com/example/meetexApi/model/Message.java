@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -18,15 +18,14 @@ public class Message {
     private String text;
 
     @Column
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate sendDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime sendDate;
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "addressee_id")
-    private User addressee;
-
+    @JoinColumn(name = "recipient_id")
+    private User recipient;
 }

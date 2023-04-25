@@ -1,6 +1,6 @@
 package com.example.meetexApi.service;
 
-import com.example.meetexApi.model.LoggedUser;
+import com.example.meetexApi.model.AuthenticatedUser;
 import com.example.meetexApi.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +30,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         user.getRoles().forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority(role.getName())));
-        return new LoggedUser(user.getUserName(), user.getPassword(), grantedAuthorities, user);
+        return new AuthenticatedUser(user.getUserName(), user.getPassword(), grantedAuthorities, user);
     }
 }

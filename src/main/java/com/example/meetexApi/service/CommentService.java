@@ -6,10 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class CommentsService {
+public class CommentService {
     private final CommentRepository commentRepository;
 
-    public CommentsService(CommentRepository commentRepository) {
+    public CommentService(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
     }
 }

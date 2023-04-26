@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -26,5 +27,9 @@ public class CompanyPageService {
 
     public List<CompanyPage> findAll() {
         return companyPageRepository.findAll();
+    }
+
+    public Optional<CompanyPage> findById(Long id) {
+        return companyPageRepository.findById(id);
     }
 }

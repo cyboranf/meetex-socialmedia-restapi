@@ -2,6 +2,8 @@ package com.example.meetexApi.service;
 
 import com.example.meetexApi.model.AuthenticatedUser;
 import com.example.meetexApi.model.User;
+import com.example.meetexApi.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,16 +17,17 @@ import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public UserDetailsServiceImpl(UserService userService) {
-        this.userService = userService;
+    @Autowired
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        User user = userService.findUserByUserName(name);
+        User user = userRepository.findUserByUserName(name);
         if (user == null) {
             throw new UsernameNotFoundException(name);
         }

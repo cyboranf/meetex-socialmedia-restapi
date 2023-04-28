@@ -1,26 +1,25 @@
 package com.example.meetexApi.security;
 
 import com.example.meetexApi.service.UserDetailsServiceImpl;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import io.jsonwebtoken.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
 
-@Component
+@Service
 public class JwtTokenProvider {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -28,22 +27,23 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    @PostConstruct
-    protected void init() {
-        jwtSecret = Base64.getEncoder().encodeToString(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    private final UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    public JwtTokenProvider(@Lazy UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     public String generateToken(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
+        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
         Date now = new Date();
-        Date validity = new Date(now.getTime() + jwtExpiration);
+        Date expiryDate = new Date(now.getTime() + jwtExpiration);
 
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
@@ -54,12 +54,19 @@ public class JwtTokenProvider {
         }
         return null;
     }
+    @PostConstruct
+    protected void init() {
+        jwtSecret = new String(Base64.getDecoder().decode(jwtSecret), StandardCharsets.UTF_8);
+    }
+    public String getUsername(String token) {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+    }
 
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | ExpiredJwtException e) {
             return false;
         }
     }
@@ -67,9 +74,5 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(getUsername(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
-    public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 }

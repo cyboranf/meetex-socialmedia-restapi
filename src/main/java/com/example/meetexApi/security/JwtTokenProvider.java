@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import io.jsonwebtoken.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
 
@@ -22,10 +22,12 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
-    private String jwtSecret;
+    private String jwtSecretStr;
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
+
+    private SecretKey jwtSecret;
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -54,17 +56,20 @@ public class JwtTokenProvider {
         }
         return null;
     }
+
     @PostConstruct
     protected void init() {
-        jwtSecret = new String(Base64.getDecoder().decode(jwtSecret), StandardCharsets.UTF_8);
+        byte[] decodedKey = Base64.getDecoder().decode(jwtSecretStr.getBytes(StandardCharsets.UTF_8));
+        jwtSecret = new SecretKeySpec(decodedKey, 0, decodedKey.length, "HmacSHA512");
     }
+
     public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).getBody().getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token);
             return true;
         } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | ExpiredJwtException e) {
             return false;

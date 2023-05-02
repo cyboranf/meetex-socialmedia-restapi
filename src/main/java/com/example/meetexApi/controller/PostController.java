@@ -8,10 +8,7 @@ import com.example.meetexApi.service.PostService;
 import com.example.meetexApi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -35,6 +32,14 @@ public class PostController {
         PostResponseDTO postResponseDTO = convertToPostResponseDTO(newPost);
         return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDTO);
     }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable Long postId) {
+        Post post = postService.getPostById(postId);
+        PostResponseDTO postResponseDTO = convertToPostResponseDTO(post);
+        return ResponseEntity.ok(postResponseDTO);
+    }
+
 
     private PostResponseDTO convertToPostResponseDTO(Post post) {
         PostResponseDTO postResponseDTO = new PostResponseDTO();

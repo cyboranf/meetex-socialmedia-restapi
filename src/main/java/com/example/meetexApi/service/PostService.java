@@ -4,6 +4,7 @@ import com.example.meetexApi.dto.post.PostRequestDTO;
 import com.example.meetexApi.model.Post;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.PostRepository;
+import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +33,6 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public Optional<Post> findById(Long id) {
-        return postRepository.findById(id);
-    }
     public Post createPost(PostRequestDTO postRequestDTO, Long userId) {
         Post post = new Post();
         post.setTitle(postRequestDTO.getTitle());
@@ -45,4 +43,10 @@ public class PostService {
         post.setSender(user);
         return postRepository.save(post);
     }
+
+    public Post getPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("Post not found with ID: " + postId));
+    }
+
 }

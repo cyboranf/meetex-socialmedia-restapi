@@ -1,5 +1,6 @@
 package com.example.meetexApi.controller;
 
+import com.example.meetexApi.dto.user.UserRequestDTO;
 import com.example.meetexApi.dto.user.UserResponseDTO;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.security.JwtTokenProvider;
@@ -10,10 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.example.meetexApi.dto.user.UserRegistrationRequest;
 import com.example.meetexApi.dto.user.UserLoginRequest;
 import com.example.meetexApi.dto.response.JwtAuthenticationResponse;
@@ -66,6 +64,22 @@ public class UserController {
         }
 
     }
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        UserResponseDTO userResponseDTO = convertToUserResponseDTO(user);
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long userId, @Valid @RequestBody UserRequestDTO userRequestDTO) {
+        User userToUpdate = convertToUser(userRequestDTO);
+        User updatedUser = userService.updateUser(userId, userToUpdate);
+        UserResponseDTO userResponseDTO = convertToUserResponseDTO(updatedUser);
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+
     private UserResponseDTO convertToUserResponseDTO(User user) {
         UserResponseDTO userResponseDTO = new UserResponseDTO();
         userResponseDTO.setId(user.getId());
@@ -75,5 +89,15 @@ public class UserController {
 
         return userResponseDTO;
     }
+    private User convertToUser(UserRequestDTO userRequestDTO) {
+        User user = new User();
+        user.setUserName(userRequestDTO.getUserName());
+        user.setUserName(userRequestDTO.getUserName());
+        user.setLastName(userRequestDTO.getLastName());
+        user.setEmail(userRequestDTO.getEmail());
+
+        return user;
+    }
+
 
 }

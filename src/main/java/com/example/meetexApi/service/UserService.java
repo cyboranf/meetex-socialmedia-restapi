@@ -5,6 +5,7 @@ import com.example.meetexApi.model.Role;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.RoleRepository;
 import com.example.meetexApi.repository.UserRepository;
+import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,10 +39,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with ID: " + id));
     }
-
     public User findFirstByEmail(String email) {
         return userRepository.findFirstByEmail(email);
     }
@@ -75,4 +75,16 @@ public class UserService {
 
         return userRepository.save(newUser);
     }
+    public User updateUser(Long id, User userToUpdate) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with ID: " + id));
+
+        user.setUserName(userToUpdate.getUserName());
+        user.setUserName(userToUpdate.getUserName());
+        user.setLastName(userToUpdate.getLastName());
+        user.setEmail(userToUpdate.getEmail());
+
+        return userRepository.save(user);
+    }
+
 }

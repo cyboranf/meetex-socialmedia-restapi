@@ -1,6 +1,7 @@
 package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.post.PostRequestDTO;
+import com.example.meetexApi.dto.post.PostUpdateRequest;
 import com.example.meetexApi.model.Post;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.PostRepository;
@@ -47,6 +48,12 @@ public class PostService {
     public Post getPostById(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new OpenApiResourceNotFoundException("Post not found with ID: " + postId));
+    }
+    public Post updatePost(Long postId, PostUpdateRequest postUpdateRequest) {
+        Post post = getPostById(postId);
+        post.setTitle(postUpdateRequest.getTitle());
+        post.setText(postUpdateRequest.getText());
+        return postRepository.save(post);
     }
 
 }

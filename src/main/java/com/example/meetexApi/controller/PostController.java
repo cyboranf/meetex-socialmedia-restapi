@@ -2,6 +2,7 @@ package com.example.meetexApi.controller;
 
 import com.example.meetexApi.dto.post.PostRequestDTO;
 import com.example.meetexApi.dto.post.PostResponseDTO;
+import com.example.meetexApi.dto.post.PostUpdateRequest;
 import com.example.meetexApi.model.Post;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.service.PostService;
@@ -40,6 +41,12 @@ public class PostController {
         return ResponseEntity.ok(postResponseDTO);
     }
 
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> updatePost(@PathVariable Long postId, @Valid @RequestBody PostUpdateRequest postUpdateRequest) {
+        Post updatedPost = postService.updatePost(postId, postUpdateRequest);
+        PostResponseDTO postResponseDTO = convertToPostResponseDTO(updatedPost);
+        return ResponseEntity.ok(postResponseDTO);
+    }
 
     private PostResponseDTO convertToPostResponseDTO(Post post) {
         PostResponseDTO postResponseDTO = new PostResponseDTO();

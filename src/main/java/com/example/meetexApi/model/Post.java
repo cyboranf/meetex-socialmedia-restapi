@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -32,8 +33,11 @@ public class Post {
     @JoinColumn(name = "addressee_id")
     private List<User> addressee;
 
-    @Column
-    private int reactions;
+    @ManyToMany
+    @JoinTable(name = "post_likes",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> likes;
 
     @Column
     private int commentCount;

@@ -61,6 +61,17 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    public Post likePost(Long postId, User user) {
+        Post post = getPostById(postId);
+
+        // Check if the user has already liked the post
+        if (post.getLikes().contains(user)) {
+            throw new IllegalArgumentException("User has already liked the post");
+        }
+
+        post.getLikes().add(user);
+        return postRepository.save(post);
+    }
 
 
 }

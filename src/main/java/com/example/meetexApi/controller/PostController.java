@@ -6,9 +6,13 @@ import com.example.meetexApi.dto.post.PostUpdateRequest;
 import com.example.meetexApi.model.Post;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.service.PostService;
+import com.example.meetexApi.service.UserDetailsServiceImpl;
 import com.example.meetexApi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,6 +57,18 @@ public class PostController {
         postService.deletePost(postId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> likePost(@PathVariable Long postId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findUserByUserName(authentication.getName());
+
+        Post updatedPost = postService.likePost(postId, currentUser);
+        PostResponseDTO postResponseDTO = convertToPostResponseDTO(updatedPost);
+        return ResponseEntity.ok(postResponseDTO);
+    }
+
+
 
 
     private PostResponseDTO convertToPostResponseDTO(Post post) {

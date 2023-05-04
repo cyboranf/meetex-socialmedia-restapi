@@ -68,7 +68,15 @@ public class PostController {
         return ResponseEntity.ok(postResponseDTO);
     }
 
+    @DeleteMapping("/{postId}/unlike")
+    public ResponseEntity<?> unlikePost(@PathVariable Long postId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findUserByUserName(authentication.getName());
 
+        Post updatedPost = postService.unlikePost(postId, currentUser);
+        PostResponseDTO postResponseDTO = convertToPostResponseDTO(updatedPost);
+        return ResponseEntity.ok(postResponseDTO);
+    }
 
 
     private PostResponseDTO convertToPostResponseDTO(Post post) {

@@ -49,6 +49,7 @@ public class PostService {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new OpenApiResourceNotFoundException("Post not found with ID: " + postId));
     }
+
     public Post updatePost(Long postId, PostUpdateRequest postUpdateRequest) {
         Post post = getPostById(postId);
         post.setTitle(postUpdateRequest.getTitle());
@@ -70,6 +71,16 @@ public class PostService {
         }
 
         post.getLikes().add(user);
+        return postRepository.save(post);
+    }
+
+    public Post unlikePost(Long postId, User user) {
+        Post post = getPostById(postId);
+
+        // Remove user from the list of users who liked the post
+        post.getLikes().remove(user);
+        post.setReactions(post.getReactions() - 1);
+
         return postRepository.save(post);
     }
 

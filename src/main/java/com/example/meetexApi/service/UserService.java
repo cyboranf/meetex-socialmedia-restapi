@@ -161,6 +161,25 @@ public class UserService {
         userRepository.save(sender);
     }
 
+    public void deleteFriendRequest(Long userId, Long receiverId) {
+        User sender = userRepository.findById(userId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + receiverId));
+
+        // Check if receiver is in the sender's sent friend requests
+        if (!sender.getSentFriendRequests().contains(receiver)) {
+            throw new IllegalArgumentException("Invalid friend request.");
+        }
+
+        // Remove receiver from sender's sent friend requests and vice versa
+        sender.getSentFriendRequests().remove(receiver);
+        receiver.getReceivedFriendRequests().remove(sender);
+
+        userRepository.save(sender);
+        userRepository.save(receiver);
+    }
+
 
     private FriendRequestResponseDTO convertToFriendRequestResponseDTO(User user) {
         FriendRequestResponseDTO dto = new FriendRequestResponseDTO();

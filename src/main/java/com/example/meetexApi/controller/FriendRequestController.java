@@ -52,5 +52,11 @@ public class FriendRequestController {
         }
     }
 
+    @DeleteMapping("/users/{userId}/delete-friend-request/{receiverId}")
+    public ResponseEntity<?> deleteFriendRequest(@PathVariable Long userId, @PathVariable Long receiverId) {
+        userService.deleteFriendRequest(userId, receiverId);
+        return ResponseEntity.ok().body("Friend request deleted.");
+    }
+
 
 }

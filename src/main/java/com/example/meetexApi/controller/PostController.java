@@ -48,6 +48,13 @@ public class PostController {
         return ResponseEntity.ok(postResponseDTO);
     }
 
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.ok().build();
+    }
+
+
     private PostResponseDTO convertToPostResponseDTO(Post post) {
         PostResponseDTO postResponseDTO = new PostResponseDTO();
         postResponseDTO.setId(post.getId());

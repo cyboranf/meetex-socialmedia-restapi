@@ -63,6 +63,16 @@ public class CommunityService {
         communityResponseDTO.setImageUrl(community.getImageUrl());
         return communityResponseDTO;
     }
+    public CommunityResponseDTO toCommunityResponseDTO(Community community) {
+        CommunityResponseDTO responseDTO = new CommunityResponseDTO();
+        responseDTO.setId(community.getId());
+        responseDTO.setName(community.getName());
+        responseDTO.setDescription(community.getDescription());
+        responseDTO.setCategory(community.getCategory());
+        responseDTO.setCreatorId(community.getCreator().getId());
+        responseDTO.setImageUrl(community.getImageUrl());
+        return responseDTO;
+    }
 
     private User getCurrentUser() {
         // Retrieve the currently logged-in user from the security context

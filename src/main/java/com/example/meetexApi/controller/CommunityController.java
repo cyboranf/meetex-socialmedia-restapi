@@ -24,4 +24,10 @@ public class CommunityController {
         return ResponseEntity.ok().body(createdCommunity);
     }
 
+    @GetMapping("/communities/{communityId}")
+    public ResponseEntity<CommunityResponseDTO> getCommunityById(@PathVariable Long communityId) {
+        return communityService.findById(communityId)
+                .map(community -> ResponseEntity.ok(communityService.toCommunityResponseDTO(community)))
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

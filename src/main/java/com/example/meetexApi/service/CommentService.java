@@ -75,4 +75,10 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("Comment not found with ID: " + commentId));
+        commentRepository.delete(comment);
+    }
+
 }

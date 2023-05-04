@@ -2,11 +2,15 @@ package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.community.CommunityRequestDTO;
 import com.example.meetexApi.dto.community.CommunityResponseDTO;
+import com.example.meetexApi.exception.ResourceNotFoundException;
+import com.example.meetexApi.exception.UnauthorizedException;
 import com.example.meetexApi.model.AuthenticatedUser;
 import com.example.meetexApi.model.Community;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.CommunityRepository;
+import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,18 +54,40 @@ public class CommunityService {
 
         Community savedCommunity = communityRepository.save(community);
 
-        return convertToCommunityResponseDTO(savedCommunity);
+        return toCommunityResponseDTO(savedCommunity);
     }
 
-    private CommunityResponseDTO convertToCommunityResponseDTO(Community community) {
-        CommunityResponseDTO communityResponseDTO = new CommunityResponseDTO();
-        communityResponseDTO.setId(community.getId());
-        communityResponseDTO.setName(community.getName());
-        communityResponseDTO.setDescription(community.getDescription());
-        communityResponseDTO.setCategory(community.getCategory());
-        communityResponseDTO.setCreatorId(community.getCreator().getId());
-        communityResponseDTO.setImageUrl(community.getImageUrl());
-        return communityResponseDTO;
+    public Community updateCommunity(Long communityId, CommunityRequestDTO communityRequestDTO, Long creatorId) {
+        return findById(communityId)
+                .map(community -> {
+                    if (community.getCreator().getId().equals(creatorId)) {
+                        community.setName(communityRequestDTO.getName());
+                        community.setDescription(communityRequestDTO.getDescription());
+                        community.setCategory(communityRequestDTO.getCategory());
+                        community.setImageUrl(communityRequestDTO.getImageUrl());
+                        return save(community);
+                    } else {
+                        throw new AccessDeniedException("You are not authorized to update this community.");
+                    }
+                })
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("Community not found with ID: " + communityId));
+    }
+
+    public CommunityResponseDTO updateCommunity(Long communityId, CommunityRequestDTO communityRequestDTO, User currentUser) {
+        Community community = findById(communityId).orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
+
+        if (!community.getCreator().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedException("You are not authorized to update this community");
+        }
+
+        community.setName(communityRequestDTO.getName());
+        Community updatedCommunity = save(community);
+
+        CommunityResponseDTO responseDTO = new CommunityResponseDTO();
+        responseDTO.setId(updatedCommunity.getId());
+        responseDTO.setName(updatedCommunity.getName());
+
+        return responseDTO;
     }
     public CommunityResponseDTO toCommunityResponseDTO(Community community) {
         CommunityResponseDTO responseDTO = new CommunityResponseDTO();

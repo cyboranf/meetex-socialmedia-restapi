@@ -1,6 +1,7 @@
 package com.example.meetexApi.service;
 
-import com.example.meetexApi.dto.user.FriendRequestDTO;
+import com.example.meetexApi.dto.friendRequest.FriendRequestDTO;
+import com.example.meetexApi.dto.friendRequest.FriendRequestResponseDTO;
 import com.example.meetexApi.dto.user.UserRegistrationRequest;
 import com.example.meetexApi.model.Role;
 import com.example.meetexApi.model.User;
@@ -13,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -107,5 +108,23 @@ public class UserService {
         userRepository.save(receiver);
     }
 
+    public List<FriendRequestResponseDTO> getAllFriendRequests(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
+
+        List<User> receivedFriendRequests = user.getReceivedFriendRequests();
+
+        return receivedFriendRequests.stream()
+                .map(this::convertToFriendRequestResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    private FriendRequestResponseDTO convertToFriendRequestResponseDTO(User user) {
+        FriendRequestResponseDTO dto = new FriendRequestResponseDTO();
+        dto.setSenderId(user.getId());
+        dto.setSenderUsername(user.getUserName());
+        dto.setEmail(user.getEmail());
+        return dto;
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.example.meetexApi.dto.user;
+package com.example.meetexApi.dto.friendRequest;
 
 import lombok.Data;
 

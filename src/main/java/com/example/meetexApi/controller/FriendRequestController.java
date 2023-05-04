@@ -1,17 +1,15 @@
 package com.example.meetexApi.controller;
 
-import com.example.meetexApi.dto.user.FriendRequestDTO;
+import com.example.meetexApi.dto.friendRequest.FriendRequestDTO;
+import com.example.meetexApi.dto.friendRequest.FriendRequestResponseDTO;
 import com.example.meetexApi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Validated
 @RestController
@@ -33,4 +31,11 @@ public class FriendRequestController {
         userService.sendFriendRequest(userId, friendRequestDTO);
         return new ResponseEntity<>("Friend request sent successfully.", HttpStatus.OK);
     }
+
+    @GetMapping("/users/{userId}/friend-requests")
+    public ResponseEntity<List<FriendRequestResponseDTO>> getAllFriendRequests(@PathVariable Long userId) {
+        List<FriendRequestResponseDTO> friendRequests = userService.getAllFriendRequests(userId);
+        return ResponseEntity.ok(friendRequests);
+    }
+
 }

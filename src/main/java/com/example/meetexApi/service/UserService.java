@@ -1,5 +1,6 @@
 package com.example.meetexApi.service;
 
+import com.example.meetexApi.dto.user.FriendRequestDTO;
 import com.example.meetexApi.dto.user.UserRegistrationRequest;
 import com.example.meetexApi.model.Role;
 import com.example.meetexApi.model.User;
@@ -42,6 +43,7 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with ID: " + id));
     }
+
     public User findFirstByEmail(String email) {
         return userRepository.findFirstByEmail(email);
     }
@@ -75,6 +77,7 @@ public class UserService {
 
         return userRepository.save(newUser);
     }
+
     public User updateUser(Long id, User userToUpdate) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with ID: " + id));
@@ -86,5 +89,23 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public void sendFriendRequest(Long userId, FriendRequestDTO friendRequestDTO) {
+        User sender = getUserById(friendRequestDTO.getSenderId());
+        User receiver = getUserById(friendRequestDTO.getReceiverId());
+
+        // Check if there's already a friend request or if they are already friends
+        if (sender.getSentFriendRequests().contains(receiver) || receiver.getSentFriendRequests().contains(sender) ||
+                sender.getFriends().contains(receiver) || receiver.getFriends().contains(sender)) {
+            throw new IllegalArgumentException("There is already a friend request or the users are already friends.");
+        }
+
+        sender.getSentFriendRequests().add(receiver);
+        receiver.getReceivedFriendRequests().add(sender);
+
+        userRepository.save(sender);
+        userRepository.save(receiver);
+    }
+
 
 }

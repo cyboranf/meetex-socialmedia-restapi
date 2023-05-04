@@ -58,4 +58,16 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "activities_id"))
     private Set<Activity> interests;
+
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @JoinTable(name = "sent_friend_requests",
+            joinColumns = @JoinColumn(name = "sender_id"),
+            inverseJoinColumns = @JoinColumn(name = "receiver_id"))
+    private List<User> sentFriendRequests;
+
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @JoinTable(name = "received_friend_requests",
+            joinColumns = @JoinColumn(name = "receiver_id"),
+            inverseJoinColumns = @JoinColumn(name = "sender_id"))
+    private List<User> receivedFriendRequests;
 }

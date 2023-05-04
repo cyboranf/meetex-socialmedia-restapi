@@ -4,5 +4,3 @@ Social media webapp which I named 'Meetex' which is like a desktop apllication i
 ERD:
 ![view App](/images/erd.png)
 
-First Look:
- ![view App](/images/welcome.png)

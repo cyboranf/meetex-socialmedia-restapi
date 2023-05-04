@@ -2,6 +2,7 @@ package com.example.meetexApi.controller;
 
 import com.example.meetexApi.dto.friendRequest.FriendRequestDTO;
 import com.example.meetexApi.dto.friendRequest.FriendRequestResponseDTO;
+import com.example.meetexApi.dto.user.UserResponseDTO;
 import com.example.meetexApi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +59,10 @@ public class FriendRequestController {
         return ResponseEntity.ok().body("Friend request deleted.");
     }
 
+    @GetMapping("/users/{userId}/friends")
+    public ResponseEntity<List<UserResponseDTO>> getAllFriends(@PathVariable Long userId) {
+        List<UserResponseDTO> friends = userService.getAllFriends(userId);
+        return ResponseEntity.ok().body(friends);
+    }
 
 }

@@ -3,6 +3,7 @@ package com.example.meetexApi.service;
 import com.example.meetexApi.dto.friendRequest.FriendRequestDTO;
 import com.example.meetexApi.dto.friendRequest.FriendRequestResponseDTO;
 import com.example.meetexApi.dto.user.UserRegistrationRequest;
+import com.example.meetexApi.dto.user.UserResponseDTO;
 import com.example.meetexApi.model.Role;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.RoleRepository;
@@ -180,6 +181,22 @@ public class UserService {
         userRepository.save(receiver);
     }
 
+    public List<UserResponseDTO> getAllFriends(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
+
+        // Get the friends list and map it to a list of UserResponseDTO objects
+        return user.getFriends().stream().map(this::convertToUserResponseDTO).collect(Collectors.toList());
+    }
+
+    private UserResponseDTO convertToUserResponseDTO(User user) {
+        UserResponseDTO userResponseDTO = new UserResponseDTO();
+        userResponseDTO.setId(user.getId());
+        userResponseDTO.setUserName(user.getUserName());
+        userResponseDTO.setEmail(user.getEmail());
+        // Set any other fields you want to expose in the UserResponseDTO
+        return userResponseDTO;
+    }
 
     private FriendRequestResponseDTO convertToFriendRequestResponseDTO(User user) {
         FriendRequestResponseDTO dto = new FriendRequestResponseDTO();

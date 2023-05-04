@@ -48,6 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/users/*/friend-requests/**").authenticated()
                 .antMatchers("/api/users/*/accept-friend-request/**").authenticated()
                 .antMatchers("/api/users/*/delete-friend-request/**").authenticated()
+                .antMatchers("/api/users/*/friends").authenticated()
                 .antMatchers("/api/posts/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

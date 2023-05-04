@@ -119,6 +119,49 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public void acceptFriendRequest(Long userId, Long senderId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + senderId));
+
+        // Check if sender is in the user's received friend requests
+        if (!user.getReceivedFriendRequests().contains(sender)) {
+            throw new IllegalArgumentException("Invalid friend request.");
+        }
+
+        // Add sender to user's friends list and vice versa
+        user.getFriends().add(sender);
+        sender.getFriends().add(user);
+
+        // Remove sender from user's received friend requests and vice versa
+        user.getReceivedFriendRequests().remove(sender);
+        sender.getSentFriendRequests().remove(user);
+
+        userRepository.save(user);
+        userRepository.save(sender);
+    }
+
+    public void declineFriendRequest(Long userId, Long senderId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + senderId));
+
+        // Check if sender is in the user's received friend requests
+        if (!user.getReceivedFriendRequests().contains(sender)) {
+            throw new IllegalArgumentException("Invalid friend request.");
+        }
+
+        // Remove sender from user's received friend requests and vice versa
+        user.getReceivedFriendRequests().remove(sender);
+        sender.getSentFriendRequests().remove(user);
+
+        userRepository.save(user);
+        userRepository.save(sender);
+    }
+
+
     private FriendRequestResponseDTO convertToFriendRequestResponseDTO(User user) {
         FriendRequestResponseDTO dto = new FriendRequestResponseDTO();
         dto.setSenderId(user.getId());

@@ -38,4 +38,19 @@ public class FriendRequestController {
         return ResponseEntity.ok(friendRequests);
     }
 
+    @PutMapping("/users/{userId}/accept-friend-request/{senderId}")
+    public ResponseEntity<?> acceptOrDeclineFriendRequest(@PathVariable Long userId, @PathVariable Long senderId,
+                                                          @RequestParam(value = "action") String action) {
+        if ("accept".equalsIgnoreCase(action)) {
+            userService.acceptFriendRequest(userId, senderId);
+            return ResponseEntity.ok().body("Friend request accepted.");
+        } else if ("decline".equalsIgnoreCase(action)) {
+            userService.declineFriendRequest(userId, senderId);
+            return ResponseEntity.ok().body("Friend request declined.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid action. Please use 'accept' or 'decline'.");
+        }
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.comment.CommentRequestDTO;
+import com.example.meetexApi.dto.comment.CommentUpdateRequestDTO;
 import com.example.meetexApi.model.Comment;
 import com.example.meetexApi.model.Post;
 import com.example.meetexApi.model.User;
@@ -66,5 +67,12 @@ public class CommentService {
         return commentRepository.findByPost(post);
     }
 
+    public Comment updateComment(Long commentId, CommentUpdateRequestDTO commentUpdateRequest) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("Comment not found with ID: " + commentId));
+
+        comment.setText(commentUpdateRequest.getText());
+        return commentRepository.save(comment);
+    }
 
 }

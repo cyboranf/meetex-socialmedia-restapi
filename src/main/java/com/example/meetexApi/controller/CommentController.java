@@ -2,6 +2,7 @@ package com.example.meetexApi.controller;
 
 import com.example.meetexApi.dto.comment.CommentRequestDTO;
 import com.example.meetexApi.dto.comment.CommentResponseDTO;
+import com.example.meetexApi.dto.comment.CommentUpdateRequestDTO;
 import com.example.meetexApi.dto.user.UserResponseDTO;
 import com.example.meetexApi.model.Comment;
 import com.example.meetexApi.model.User;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/api")
 public class CommentController {
 
     private final CommentService commentService;
@@ -29,7 +30,7 @@ public class CommentController {
         this.userService = userService;
     }
 
-    @PostMapping("/{postId}/comments")
+    @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponseDTO> createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDTO commentRequestDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUserName(authentication.getName());
@@ -48,6 +49,12 @@ public class CommentController {
         return ResponseEntity.ok(commentResponseDTOs);
     }
 
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<CommentResponseDTO> updateComment(@PathVariable Long commentId, @Valid @RequestBody CommentUpdateRequestDTO commentUpdateRequest) {
+        Comment updatedComment = commentService.updateComment(commentId, commentUpdateRequest);
+        CommentResponseDTO commentResponseDTO = convertToCommentResponseDTO(updatedComment);
+        return ResponseEntity.ok(commentResponseDTO);
+    }
 
     private CommentResponseDTO convertToCommentResponseDTO(Comment comment) {
         CommentResponseDTO commentResponseDTO = new CommentResponseDTO();

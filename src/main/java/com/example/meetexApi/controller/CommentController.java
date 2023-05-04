@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -36,6 +38,16 @@ public class CommentController {
         CommentResponseDTO commentResponseDTO = convertToCommentResponseDTO(newComment);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDTO);
     }
+
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<List<CommentResponseDTO>> getAllCommentsForPost(@PathVariable Long postId) {
+        List<Comment> comments = commentService.getAllCommentsForPost(postId);
+        List<CommentResponseDTO> commentResponseDTOs = comments.stream()
+                .map(this::convertToCommentResponseDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(commentResponseDTOs);
+    }
+
 
     private CommentResponseDTO convertToCommentResponseDTO(Comment comment) {
         CommentResponseDTO commentResponseDTO = new CommentResponseDTO();

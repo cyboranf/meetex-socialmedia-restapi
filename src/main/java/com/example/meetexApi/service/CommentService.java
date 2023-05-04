@@ -5,6 +5,8 @@ import com.example.meetexApi.model.Comment;
 import com.example.meetexApi.model.Post;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.CommentRepository;
+import com.example.meetexApi.repository.PostRepository;
+import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +17,15 @@ import java.util.Optional;
 @Service
 @Transactional
 public class CommentService {
-    private final PostService postService;
+
     private final CommentRepository commentRepository;
 
-    public CommentService(PostService postService, CommentRepository commentRepository) {
-        this.postService = postService;
+    private final PostRepository postRepository;
+
+    public CommentService(CommentRepository commentRepository, PostRepository postRepository) {
+
         this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
     }
 
     public Comment save(Comment comment) {
@@ -40,7 +45,7 @@ public class CommentService {
     }
 
     public Comment createComment(Long postId, CommentRequestDTO commentRequestDTO, User user) {
-        Post post = postService.getPostById(postId);
+        Post post = postRepository.getById(postId);
         Comment comment = new Comment();
         comment.setText(commentRequestDTO.getText());
         comment.setSender(user);
@@ -50,9 +55,16 @@ public class CommentService {
         Comment savedComment = commentRepository.save(comment);
         post.getComments().add(savedComment);
         post.setCommentCount(post.getCommentCount() + 1);
-        postService.save(post);
+        postRepository.save(post);
 
         return savedComment;
     }
+
+    public List<Comment> getAllCommentsForPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new OpenApiResourceNotFoundException("Post not found with ID: " + postId));
+        return commentRepository.findByPost(post);
+    }
+
 
 }

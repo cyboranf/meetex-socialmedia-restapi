@@ -100,6 +100,17 @@ public class CommunityService {
         delete(community);
     }
 
+    public void addMember(Long communityId, User userToAdd, User currentUser) {
+        Community community = findById(communityId).orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
+
+        if (!community.getCreator().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedException("You are not authorized to add members to this community");
+        }
+
+        community.getMembers().add(userToAdd);
+        save(community);
+    }
+
     public CommunityResponseDTO toCommunityResponseDTO(Community community) {
         CommunityResponseDTO responseDTO = new CommunityResponseDTO();
         responseDTO.setId(community.getId());

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -56,6 +57,22 @@ public class CommunityController {
 
         CommunityResponseDTO updatedCommunity = communityService.updateCommunity(communityId, communityRequestDTO, currentUser);
         return ResponseEntity.ok(updatedCommunity);
+    }
+
+    @DeleteMapping("/communities/{communityId}")
+    public ResponseEntity<?> deleteCommunity(@PathVariable Long communityId) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+
+        User currentUser = userService.findUserByUserName(username);
+
+        communityService.deleteCommunity(communityId, currentUser);
+        return ResponseEntity.ok().build();
     }
 
 }

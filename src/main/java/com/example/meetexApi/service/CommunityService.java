@@ -89,6 +89,17 @@ public class CommunityService {
 
         return responseDTO;
     }
+
+    public void deleteCommunity(Long communityId, User currentUser) {
+        Community community = findById(communityId).orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
+
+        if (!community.getCreator().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedException("You are not authorized to delete this community");
+        }
+
+        delete(community);
+    }
+
     public CommunityResponseDTO toCommunityResponseDTO(Community community) {
         CommunityResponseDTO responseDTO = new CommunityResponseDTO();
         responseDTO.setId(community.getId());

@@ -2,14 +2,15 @@ package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.community.CommunityRequestDTO;
 import com.example.meetexApi.dto.community.CommunityResponseDTO;
+import com.example.meetexApi.exception.BadRequestException;
 import com.example.meetexApi.exception.ResourceNotFoundException;
 import com.example.meetexApi.exception.UnauthorizedException;
 import com.example.meetexApi.model.AuthenticatedUser;
 import com.example.meetexApi.model.Community;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.CommunityRepository;
+import com.example.meetexApi.repository.UserRepository;
 import org.springdoc.api.OpenApiResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,11 @@ import java.util.Optional;
 public class CommunityService {
     private final CommunityRepository communityRepository;
 
-    @Autowired
-    public CommunityService(CommunityRepository communityRepository) {
+    private final UserRepository userRepository;
+
+    public CommunityService(CommunityRepository communityRepository, UserRepository userRepository) {
         this.communityRepository = communityRepository;
+        this.userRepository = userRepository;
     }
 
     public Community save(Community community) {
@@ -109,6 +112,21 @@ public class CommunityService {
 
         community.getMembers().add(userToAdd);
         save(community);
+    }
+
+    public void removeMember(Long communityId, Long memberId) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
+
+        User member = userRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + memberId));
+
+        if (!community.getMembers().contains(member)) {
+            throw new BadRequestException("The specified user is not a member of this community.");
+        }
+
+        community.getMembers().remove(member);
+        communityRepository.save(community);
     }
 
     public CommunityResponseDTO toCommunityResponseDTO(Community community) {

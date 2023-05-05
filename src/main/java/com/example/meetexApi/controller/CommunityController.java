@@ -93,4 +93,11 @@ public class CommunityController {
         communityService.addMember(communityId, userToAdd, currentUser);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/communities/{communityId}/members/{memberId}")
+    public ResponseEntity<?> removeMember(@PathVariable Long communityId, @PathVariable Long memberId) {
+        communityService.removeMember(communityId, memberId);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -53,6 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/communities/**").authenticated()
                 .antMatchers(HttpMethod.DELETE, "/api/communities/**").authenticated()
                 .antMatchers(HttpMethod.POST, "/api/communities/*/members").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/communities/*/members/*").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/communities/**").permitAll()
                 .antMatchers("/api/posts/**").permitAll()
                 .anyRequest().authenticated()

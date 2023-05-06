@@ -59,6 +59,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/messages/**").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/users/*/notifications").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/communities/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/notifications/*").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/notifications/*").authenticated()
                 .antMatchers("/api/posts/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

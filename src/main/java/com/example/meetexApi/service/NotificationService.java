@@ -1,11 +1,14 @@
 package com.example.meetexApi.service;
 
+import com.example.meetexApi.dto.notification.NotificationRequestDTO;
 import com.example.meetexApi.dto.notification.NotificationResponseDTO;
 import com.example.meetexApi.model.Notification;
 import com.example.meetexApi.repository.NotificationRepository;
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,5 +51,21 @@ public class NotificationService {
         dto.setToUserId(notification.getToUser().getId());
         dto.setDate(notification.getDate().toLocalDate());
         return dto;
+    }
+    public NotificationResponseDTO updateNotification(Long notificationId, NotificationRequestDTO notificationRequestDTO) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("Notification not found with id: " + notificationId));
+
+        notification.setDescription(notificationRequestDTO.getDescription());
+        Notification updatedNotification = notificationRepository.save(notification);
+
+        return mapToDTO(updatedNotification);
+    }
+
+    public void deleteNotification(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("Notification not found with id: " + notificationId));
+
+        notificationRepository.delete(notification);
     }
 }

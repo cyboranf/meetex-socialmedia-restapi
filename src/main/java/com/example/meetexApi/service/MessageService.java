@@ -2,6 +2,7 @@ package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.message.MessageRequestDTO;
 import com.example.meetexApi.dto.message.MessageResponseDTO;
+import com.example.meetexApi.exception.BadRequestException;
 import com.example.meetexApi.model.Message;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.MessageRepository;
@@ -89,6 +90,20 @@ public class MessageService {
         messageResponseDTO.setSenderId(message.getSender().getId());
         messageResponseDTO.setRecipientId(message.getRecipient().getId());
         return messageResponseDTO;
+    }
+
+    public void deleteMessage(Long messageId, String currentUsername) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new EntityNotFoundException("Message not found with id: " + messageId));
+
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + currentUsername));
+
+        if (!currentUser.getId().equals(message.getSender().getId())) {
+            throw new BadRequestException("You are not authorized to delete this message");
+        }
+
+        messageRepository.deleteById(messageId);
     }
 
 

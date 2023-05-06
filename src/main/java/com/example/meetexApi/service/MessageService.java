@@ -12,8 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -65,4 +67,29 @@ public class MessageService {
 
         return messageResponseDTO;
     }
+
+    public List<Message> findAllMessagesBetweenUsers(Long senderId, Long recipientId) {
+        List<Message> messages = messageRepository.findAllBySender_IdAndRecipient_Id(senderId, recipientId);
+        messages.addAll(messageRepository.findAllBySender_IdAndRecipient_Id(recipientId, senderId));
+        messages.sort(Comparator.comparing(Message::getSendDate));
+        return messages;
+    }
+
+    public List<MessageResponseDTO> toMessageResponseDTOList(List<Message> messages) {
+        return messages.stream()
+                .map(this::toMessageResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public MessageResponseDTO toMessageResponseDTO(Message message) {
+        MessageResponseDTO messageResponseDTO = new MessageResponseDTO();
+        messageResponseDTO.setId(message.getId());
+        messageResponseDTO.setText(message.getText());
+        messageResponseDTO.setSendDate(message.getSendDate());
+        messageResponseDTO.setSenderId(message.getSender().getId());
+        messageResponseDTO.setRecipientId(message.getRecipient().getId());
+        return messageResponseDTO;
+    }
+
+
 }

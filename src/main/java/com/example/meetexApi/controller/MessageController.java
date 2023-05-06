@@ -2,12 +2,14 @@ package com.example.meetexApi.controller;
 
 import com.example.meetexApi.dto.message.MessageRequestDTO;
 import com.example.meetexApi.dto.message.MessageResponseDTO;
+import com.example.meetexApi.model.Message;
 import com.example.meetexApi.service.MessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -24,4 +26,11 @@ public class MessageController {
         MessageResponseDTO messageResponseDTO = messageService.sendMessage(userId, messageRequestDTO);
         return ResponseEntity.ok(messageResponseDTO);
     }
+    @GetMapping("/users/{userId}/messages")
+    public ResponseEntity<List<MessageResponseDTO>> getAllMessages(@PathVariable Long userId, @RequestParam(required = false) Long recipientId) {
+        List<Message> messages = messageService.findAllMessagesBetweenUsers(userId, recipientId);
+        List<MessageResponseDTO> messageResponseDTOList = messageService.toMessageResponseDTOList(messages);
+        return ResponseEntity.ok(messageResponseDTOList);
+    }
+
 }

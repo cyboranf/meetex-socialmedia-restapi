@@ -96,7 +96,7 @@ public class MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new EntityNotFoundException("Message not found with id: " + messageId));
 
-        User currentUser = userRepository.findByUsername(currentUsername)
+        User currentUser = userRepository.findByUserName(currentUsername)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + currentUsername));
 
         if (!currentUser.getId().equals(message.getSender().getId())) {

@@ -87,7 +87,7 @@ public class CommunityController {
             username = principal.toString();
         }
 
-        User currentUser = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        User currentUser = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         User userToAdd = userRepository.findById(memberRequestDTO.getUserId()).get();
 
         communityService.addMember(communityId, userToAdd, currentUser);

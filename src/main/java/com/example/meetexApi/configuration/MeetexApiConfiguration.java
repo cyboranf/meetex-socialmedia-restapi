@@ -20,14 +20,14 @@ public class MeetexApiConfiguration implements WebMvcConfigurer {
 //        registry.addViewController("/login");
 //    }
 
-    @Bean
-    public ViewResolver viewResolver() {
-        InternalResourceViewResolver bean = new InternalResourceViewResolver();
-        bean.setPrefix("/WEB-INF/views/");
-        bean.setSuffix(".jsp");
-        bean.setOrder(0);
-        return bean;
-    }
+//    @Bean
+//    public ViewResolver viewResolver() {
+//        InternalResourceViewResolver bean = new InternalResourceViewResolver();
+//        bean.setPrefix("/WEB-INF/views/");
+//        bean.setSuffix(".jsp");
+//        bean.setOrder(0);
+//        return bean;
+//    }
 
     @Bean(name = "localeResolver")
     public LocaleContextResolver getLocaleContextResolver() {

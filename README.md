@@ -1,6 +1,6 @@
-# Social Media Meetex Web Application
+# Social Media Meetex REST API 
 
-This project is a web application designed for social media interactions and event management, named Social Media Meetex. It is built using Spring Boot and provides various features, such as user authentication, event creation, and event management.
+This project is a REST API designed for social media interactions and event management, named Social Media Meetex. It is built using Spring Boot and provides various features, such as user authentication, event creation, and event management.
 
 ## ERD
 

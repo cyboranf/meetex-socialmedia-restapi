@@ -1,6 +1,9 @@
 package com.example.meetexApi.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -9,7 +12,9 @@ import java.util.List;
 
 @Table(name = "comment")
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

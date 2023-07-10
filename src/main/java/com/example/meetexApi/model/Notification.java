@@ -1,6 +1,8 @@
 package com.example.meetexApi.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -8,7 +10,9 @@ import java.time.LocalDateTime;
 
 @Table(name = "notification")
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

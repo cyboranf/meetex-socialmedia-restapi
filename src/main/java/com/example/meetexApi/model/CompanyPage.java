@@ -1,6 +1,8 @@
 package com.example.meetexApi.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -9,7 +11,9 @@ import java.util.Set;
 
 @Entity
 @Table
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class CompanyPage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

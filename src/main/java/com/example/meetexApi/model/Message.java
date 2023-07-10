@@ -1,13 +1,17 @@
 package com.example.meetexApi.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "message")
 public class Message {
     @Id

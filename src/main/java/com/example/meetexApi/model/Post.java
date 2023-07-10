@@ -1,6 +1,9 @@
 package com.example.meetexApi.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -9,7 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "post")
 public class Post {
     @Id
@@ -29,8 +34,10 @@ public class Post {
     @JoinColumn(name = "sender_id")
     private User sender;
 
-    @ManyToMany
-    @JoinColumn(name = "addressee_id")
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "post_addressee",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> addressee;
 
     @Column

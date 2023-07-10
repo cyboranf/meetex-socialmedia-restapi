@@ -1,8 +1,9 @@
 package com.example.meetexApi.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -11,7 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "user")
 public class User {
     @Id
@@ -36,8 +39,10 @@ public class User {
     @Column(length = 100)
     private String password;
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    @JoinTable(name = "user_friends", joinColumns = {@JoinColumn(name = "user_id", unique = false)}, inverseJoinColumns = {@JoinColumn(name = "friend_id", unique = false)})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(name = "user_friends",
+            joinColumns = {@JoinColumn(name = "user_id", unique = false)},
+            inverseJoinColumns = {@JoinColumn(name = "friend_id", unique = false)})
     @Nullable
     private List<User> friends;
 

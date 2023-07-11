@@ -1,14 +1,18 @@
 package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.friendRequest.FriendRequestDTO;
-import com.example.meetexApi.dto.friendRequest.FriendRequestResponseDTO;
 import com.example.meetexApi.dto.user.UserRegistrationRequest;
+import com.example.meetexApi.dto.user.UserRequestDTO;
 import com.example.meetexApi.dto.user.UserResponseDTO;
+import com.example.meetexApi.exception.user.RoleNotFoundException;
+import com.example.meetexApi.exception.user.UserNotFoundException;
+import com.example.meetexApi.mapper.UserMapper;
 import com.example.meetexApi.model.Role;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.RoleRepository;
 import com.example.meetexApi.repository.UserRepository;
-import org.springdoc.api.OpenApiResourceNotFoundException;
+import com.example.meetexApi.validation.UserValidator;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,113 +27,100 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final UserValidator userValidator;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, UserValidator userValidator, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.userValidator = userValidator;
+        this.userMapper = userMapper;
     }
 
-    public User save(User user) {
-        return userRepository.save(user);
-    }
+    /**
+     * @param registrationRequest
+     * @return DTO of new User
+     */
+    public UserResponseDTO registerUser(UserRegistrationRequest registrationRequest) {
+        userValidator.validateRegistration(registrationRequest);
 
-    public void delete(User user) {
-        userRepository.delete(user);
-    }
-
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with ID: " + id));
-    }
-
-    public User findFirstByEmail(String email) {
-        return userRepository.findFirstByEmail(email);
-    }
-
-    public User findUserByUserName(String userName) {
-        return userRepository.findUserByUserName(userName);
-    }
-
-    public User registerUser(UserRegistrationRequest registrationRequest) {
-        // Check if the username already exists
-        if (userRepository.existsByUserName(registrationRequest.getUsername())) {
-            throw new IllegalArgumentException("Username is already taken.");
-        }
-
-        // Check if the email already exists
-        if (userRepository.existsByEmail(registrationRequest.getEmail())) {
-            throw new IllegalArgumentException("Email is already in use.");
-        }
-
-        // Create a new User object with the registration details
         User newUser = new User();
         newUser.setUserName(registrationRequest.getUsername());
         newUser.setEmail(registrationRequest.getEmail());
         newUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
 
-
         // Assign a default role to the user
-        Role defaultRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new IllegalArgumentException("Default user role not found."));
+        Role defaultRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new RoleNotFoundException("Default user role not found."));
         newUser.setRoles(Collections.singleton(defaultRole));
 
-        return userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+
+        return userMapper.userToUserResponseDTO(savedUser);
     }
 
-    public User updateUser(Long id, User userToUpdate) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with ID: " + id));
+    /**
+     * @param id
+     * @param userRequestDTO
+     * @return Dto of updatedUser
+     */
+    public UserResponseDTO updateUser(Long id, UserRequestDTO userRequestDTO) {
+        userValidator.validateUpdateOfUser(id, userRequestDTO);
 
-        user.setUserName(userToUpdate.getUserName());
-        user.setUserName(userToUpdate.getUserName());
-        user.setLastName(userToUpdate.getLastName());
-        user.setEmail(userToUpdate.getEmail());
+        User updatingUser = new User();
 
-        return userRepository.save(user);
+        updatingUser.setUserName(userRequestDTO.getUserName());
+        updatingUser.setLastName(userRequestDTO.getLastName());
+        updatingUser.setEmail(userRequestDTO.getEmail());
+
+        User savedUser = userRepository.save(updatingUser);
+
+        return userMapper.userToUserResponseDTO(savedUser);
     }
 
-    public void sendFriendRequest(Long userId, FriendRequestDTO friendRequestDTO) {
-        User sender = getUserById(friendRequestDTO.getSenderId());
-        User receiver = getUserById(friendRequestDTO.getReceiverId());
+    /**
+     * @param userId
+     * @param friendRequestDTO
+     * @return communicat about friend request
+     */
+    public String sendFriendRequest(Long userId, FriendRequestDTO friendRequestDTO) {
+        User sender = userRepository.findById(friendRequestDTO.getSenderId()).orElseThrow(() -> new UserNotFoundException("Can not found user with id = " + friendRequestDTO.getSenderId()));
+        User receiver = userRepository.findById(friendRequestDTO.getReceiverId()).orElseThrow(() -> new UserNotFoundException("Can not found User with id = " + friendRequestDTO.getReceiverId()));
 
-        // Check if there's already a friend request or if they are already friends
-        if (sender.getSentFriendRequests().contains(receiver) || receiver.getSentFriendRequests().contains(sender) ||
-                sender.getFriends().contains(receiver) || receiver.getFriends().contains(sender)) {
-            throw new IllegalArgumentException("There is already a friend request or the users are already friends.");
-        }
+        userValidator.validateFriendRequest(sender, receiver);
 
         sender.getSentFriendRequests().add(receiver);
         receiver.getReceivedFriendRequests().add(sender);
 
         userRepository.save(sender);
         userRepository.save(receiver);
+
+        return "Friend request sent to user with username = " + receiver.getUserName();
     }
 
-    public List<FriendRequestResponseDTO> getAllFriendRequests(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
+    /**
+     * @param userId
+     * @return List of all user friends
+     */
+    public List<UserResponseDTO> getAllFriends(Long userId) {
+        userValidator.validateUserExistsAndHasFriends(userId);
 
-        List<User> receivedFriendRequests = user.getReceivedFriendRequests();
+        User user = userRepository.findById(userId).get();  // We can call .get() safely now because we've validated that the user exists.
 
-        return receivedFriendRequests.stream()
-                .map(this::convertToFriendRequestResponseDTO)
-                .collect(Collectors.toList());
+        List<UserResponseDTO> returnedList = user.getFriends().stream().map(userMapper::userToUserResponseDTO).collect(Collectors.toList());
+
+        return returnedList;
     }
 
+    /**
+     * @param userId
+     * @param senderId
+     */
     public void acceptFriendRequest(Long userId, Long senderId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
-        User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + senderId));
+        User user = userValidator.validateUserExists(userId);
+        User sender = userValidator.validateUserExists(senderId);
 
-        // Check if sender is in the user's received friend requests
-        if (!user.getReceivedFriendRequests().contains(sender)) {
-            throw new IllegalArgumentException("Invalid friend request.");
-        }
+        userValidator.validateFriendRequestReceived(user, sender);
 
         // Add sender to user's friends list and vice versa
         user.getFriends().add(sender);
@@ -143,16 +134,15 @@ public class UserService {
         userRepository.save(sender);
     }
 
+    /**
+     * @param userId
+     * @param senderId
+     */
     public void declineFriendRequest(Long userId, Long senderId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
-        User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + senderId));
+        User user = userValidator.validateUserExists(userId);
+        User sender = userValidator.validateUserExists(senderId);
 
-        // Check if sender is in the user's received friend requests
-        if (!user.getReceivedFriendRequests().contains(sender)) {
-            throw new IllegalArgumentException("Invalid friend request.");
-        }
+        userValidator.validateFriendRequestReceived(user, sender);
 
         // Remove sender from user's received friend requests and vice versa
         user.getReceivedFriendRequests().remove(sender);
@@ -162,16 +152,15 @@ public class UserService {
         userRepository.save(sender);
     }
 
+    /**
+     * @param userId
+     * @param receiverId
+     */
     public void deleteFriendRequest(Long userId, Long receiverId) {
-        User sender = userRepository.findById(userId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
-        User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + receiverId));
+        User sender = userValidator.validateUserExists(userId);
+        User receiver = userValidator.validateUserExists(receiverId);
 
-        // Check if receiver is in the sender's sent friend requests
-        if (!sender.getSentFriendRequests().contains(receiver)) {
-            throw new IllegalArgumentException("Invalid friend request.");
-        }
+        userValidator.validateFriendRequestSent(sender, receiver);
 
         // Remove receiver from sender's sent friend requests and vice versa
         sender.getSentFriendRequests().remove(receiver);
@@ -180,30 +169,4 @@ public class UserService {
         userRepository.save(sender);
         userRepository.save(receiver);
     }
-
-    public List<UserResponseDTO> getAllFriends(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("User not found with id: " + userId));
-
-        // Get the friends list and map it to a list of UserResponseDTO objects
-        return user.getFriends().stream().map(this::convertToUserResponseDTO).collect(Collectors.toList());
-    }
-
-    private UserResponseDTO convertToUserResponseDTO(User user) {
-        UserResponseDTO userResponseDTO = new UserResponseDTO();
-        userResponseDTO.setId(user.getId());
-        userResponseDTO.setUserName(user.getUserName());
-        userResponseDTO.setEmail(user.getEmail());
-        // Set any other fields you want to expose in the UserResponseDTO
-        return userResponseDTO;
-    }
-
-    private FriendRequestResponseDTO convertToFriendRequestResponseDTO(User user) {
-        FriendRequestResponseDTO dto = new FriendRequestResponseDTO();
-        dto.setSenderId(user.getId());
-        dto.setSenderUsername(user.getUserName());
-        dto.setEmail(user.getEmail());
-        return dto;
-    }
-
 }

@@ -67,7 +67,7 @@ public class UserService {
     public UserResponseDTO updateUser(Long id, UserRequestDTO userRequestDTO) {
         userValidator.validateUpdateOfUser(id, userRequestDTO);
 
-        User updatingUser = new User();
+        User updatingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         updatingUser.setUserName(userRequestDTO.getUserName());
         updatingUser.setLastName(userRequestDTO.getLastName());

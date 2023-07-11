@@ -28,19 +28,9 @@ public class CommentService {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
     }
-
-    public Comment save(Comment comment) {
-        return commentRepository.save(comment);
-    }
-
     public void delete(Comment comment) {
         commentRepository.delete(comment);
     }
-
-    public List<Comment> findAll() {
-        return commentRepository.findAll();
-    }
-
     public Optional<Comment> findById(Long id) {
         return commentRepository.findById(id);
     }

@@ -21,19 +21,9 @@ public class NotificationService {
     public NotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
-
-    public Notification save(Notification notification) {
-        return notificationRepository.save(notification);
-    }
-
     public void delete(Notification notification) {
         notificationRepository.delete(notification);
     }
-
-    public List<Notification> findAll() {
-        return notificationRepository.findAll();
-    }
-
     public Optional<Notification> findById(Long id) {
         return notificationRepository.findById(id);
     }

@@ -16,19 +16,9 @@ public class CompanyPageService {
     public CompanyPageService(CompanyPageRepository companyPageRepository) {
         this.companyPageRepository = companyPageRepository;
     }
-
-    public CompanyPage save(CompanyPage companyPage) {
-        return companyPageRepository.save(companyPage);
-    }
-
     public void delete(CompanyPage companyPage) {
         companyPageRepository.delete(companyPage);
     }
-
-    public List<CompanyPage> findAll() {
-        return companyPageRepository.findAll();
-    }
-
     public Optional<CompanyPage> findById(Long id) {
         return companyPageRepository.findById(id);
     }

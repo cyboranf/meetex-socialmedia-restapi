@@ -28,7 +28,6 @@ public class MessageService {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
     }
-
     public Message save(Message message) {
         return messageRepository.save(message);
     }
@@ -36,11 +35,6 @@ public class MessageService {
     public void delete(Message message) {
         messageRepository.delete(message);
     }
-
-    public List<Message> findAll() {
-        return messageRepository.findAll();
-    }
-
     public Optional<Message> findById(Long id) {
         return messageRepository.findById(id);
     }

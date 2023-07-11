@@ -17,16 +17,8 @@ public class ActivityService {
         this.activityRepository = activityRepository;
     }
 
-    public Activity save(Activity activity) {
-        return activityRepository.save(activity);
-    }
-
     public void delete(Activity activity) {
         activityRepository.delete(activity);
-    }
-
-    public List<Activity> findAll() {
-        return activityRepository.findAll();
     }
 
     public Optional<Activity> findById(Long id) {

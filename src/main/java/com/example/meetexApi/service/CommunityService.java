@@ -30,7 +30,6 @@ public class CommunityService {
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
     }
-
     public Community save(Community community) {
         return communityRepository.save(community);
     }
@@ -38,11 +37,6 @@ public class CommunityService {
     public void delete(Community community) {
         communityRepository.delete(community);
     }
-
-    public List<Community> findAll() {
-        return communityRepository.findAll();
-    }
-
     public Optional<Community> findById(Long id) {
         return communityRepository.findById(id);
     }

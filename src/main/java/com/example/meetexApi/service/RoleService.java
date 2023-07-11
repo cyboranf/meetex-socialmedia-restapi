@@ -5,7 +5,6 @@ import com.example.meetexApi.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,23 +16,18 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    public Role save(Role role) {
-        return roleRepository.save(role);
-    }
-
+    /**
+     * @param role
+     */
     public void delete(Role role) {
         roleRepository.delete(role);
     }
 
-    public List<Role> findAll() {
-        return roleRepository.findAll();
-    }
-
+    /**
+     * @param id
+     * @return
+     */
     public Optional<Role> findById(Long id) {
         return roleRepository.findById(id);
-    }
-
-    public Role findRoleByName(String name) {
-        return roleRepository.findByName(name).get();
     }
 }

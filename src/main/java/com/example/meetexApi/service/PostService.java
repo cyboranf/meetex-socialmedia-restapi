@@ -22,16 +22,8 @@ public class PostService {
         this.postRepository = postRepository;
     }
 
-    public Post save(Post post) {
-        return postRepository.save(post);
-    }
-
     public void delete(Post post) {
         postRepository.delete(post);
-    }
-
-    public List<Post> findAll() {
-        return postRepository.findAll();
     }
 
     public Post createPost(PostRequestDTO postRequestDTO, Long userId) {

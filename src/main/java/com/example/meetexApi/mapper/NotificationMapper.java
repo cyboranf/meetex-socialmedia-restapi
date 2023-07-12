@@ -7,12 +7,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface NotificationMapper {
     NotificationMapper INSTANCE = Mappers.getMapper(NotificationMapper.class);
 
-    @Mapping(source = "fromUser.id", target = "fromUser.id")
-    @Mapping(source = "toUser.id", target = "toUser.id")
+    @Mapping(source = "fromUser.id", target = "fromUserId")
+    @Mapping(source = "toUser.id", target = "toUserId")
     NotificationResponseDTO notificationtoNotificationResponseDTO(Notification notification);
 
     @Mapping(source = "fromUserId", target = "fromUser.id")

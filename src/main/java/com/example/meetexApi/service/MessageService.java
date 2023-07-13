@@ -2,21 +2,17 @@ package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.message.MessageRequestDTO;
 import com.example.meetexApi.dto.message.MessageResponseDTO;
-import com.example.meetexApi.exception.BadRequestException;
 import com.example.meetexApi.mapper.MessageMapper;
 import com.example.meetexApi.model.Message;
-import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.MessageRepository;
 import com.example.meetexApi.repository.UserRepository;
 import com.example.meetexApi.validation.MessageValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

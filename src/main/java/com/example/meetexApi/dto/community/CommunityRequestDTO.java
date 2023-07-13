@@ -12,9 +12,11 @@ public class CommunityRequestDTO {
     private String name;
 
     @NotBlank
+    @Size(max = 500)
     private String description;
 
     @NotBlank
+    @Size(max = 20)
     private String category;
 
     private String imageUrl;

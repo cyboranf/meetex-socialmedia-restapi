@@ -11,7 +11,6 @@ import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.PostRepository;
 import com.example.meetexApi.repository.UserRepository;
 import com.example.meetexApi.validation.PostValidator;
-import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +38,7 @@ public class PostService {
         postRepository.delete(postValidator.deleteValidation(id));
     }
 
+
     /**
      * @param postRequestDTO
      * @param userId
@@ -65,8 +65,10 @@ public class PostService {
      * @param postId
      * @return
      */
-    public Post getPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post not found with ID: " + postId));
+    public PostResponseDTO getPostById(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found with ID: " + postId));
+        return postMapper.postToPostResponseDTO(post);
     }
 
     /**
@@ -77,7 +79,7 @@ public class PostService {
     public PostResponseDTO updatePost(Long postId, PostUpdateRequest postUpdateRequest) {
         postValidator.updatePostValidation(postId, postUpdateRequest);
 
-        Post post = getPostById(postId);
+        Post post = postRepository.findById(postId).get();
 
         post.setTitle(postUpdateRequest.getTitle());
         post.setText(postUpdateRequest.getText());
@@ -94,7 +96,7 @@ public class PostService {
     public PostResponseDTO likePost(Long postId, Long userId) {
         User user = postValidator.likingPostValidation(postId, userId);
 
-        Post post = getPostById(postId);
+        Post post = postRepository.findById(postId).get();
 
         post.getLikes().add(user);
         post.setReactions(post.getReactions() + 1);
@@ -111,7 +113,7 @@ public class PostService {
     public PostResponseDTO unlikePost(Long postId, Long userId) {
         User user = postValidator.unlikingPostValidation(postId, userId);
 
-        Post post = getPostById(postId);
+        Post post = postRepository.findById(postId).get();
 
         post.getLikes().remove(user);
         post.setReactions(post.getReactions() - 1);

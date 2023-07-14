@@ -30,37 +30,45 @@ public class CommunityController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * @param communityRequestDTO
+     * @return DTO of new community
+     */
     @PostMapping("/communities")
     public ResponseEntity<CommunityResponseDTO> createCommunity(@Valid @RequestBody CommunityRequestDTO communityRequestDTO) {
         CommunityResponseDTO createdCommunity = communityService.createCommunity(communityRequestDTO);
         return ResponseEntity.ok().body(createdCommunity);
     }
 
+    /**
+     * @param communityId
+     * @return DTO of community with id = {communityId}
+     */
     @GetMapping("/communities/{communityId}")
     public ResponseEntity<CommunityResponseDTO> getCommunityById(@PathVariable Long communityId) {
-        return communityService.findById(communityId)
-                .map(community -> ResponseEntity.ok(communityService.toCommunityResponseDTO(community)))
-                .orElse(ResponseEntity.notFound().build());
+        CommunityResponseDTO community = communityService.findById(communityId);
+        return ResponseEntity.ok(community);
     }
+
+    /**
+     * @param communityId
+     * @param communityRequestDTO
+     * @return DTO of updated Community
+     */
     @PutMapping("/communities/{communityId}")
     public ResponseEntity<CommunityResponseDTO> updateCommunity(
             @PathVariable Long communityId,
             @Valid @RequestBody CommunityRequestDTO communityRequestDTO) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        User currentUser = userService.findUserByUserName(username);
-
-        CommunityResponseDTO updatedCommunity = communityService.updateCommunity(communityId, communityRequestDTO, currentUser);
+        CommunityResponseDTO updatedCommunity = communityService.updateCommunity(communityId, communityRequestDTO);
         return ResponseEntity.ok(updatedCommunity);
     }
 
+    /**
+     *
+     * @param communityId
+     * @return
+     */
     @DeleteMapping("/communities/{communityId}")
     public ResponseEntity<?> deleteCommunity(@PathVariable Long communityId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -71,12 +79,17 @@ public class CommunityController {
             username = principal.toString();
         }
 
-        User currentUser = userService.findUserByUserName(username);
+        User currentUser = userService.getUserByUsername(username);
 
         communityService.deleteCommunity(communityId, currentUser);
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * @param communityId
+     * @param memberRequestDTO
+     * @return
+     */
     @PostMapping("/communities/{communityId}/members")
     public ResponseEntity<?> addMember(@PathVariable Long communityId, @Valid @RequestBody MemberRequestDTO memberRequestDTO) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -94,10 +107,23 @@ public class CommunityController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * @param communityId
+     * @param memberId
+     * @return
+     */
     @DeleteMapping("/communities/{communityId}/members/{memberId}")
     public ResponseEntity<?> removeMember(@PathVariable Long communityId, @PathVariable Long memberId) {
-        communityService.removeMember(communityId, memberId);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        User userToRemove = userRepository.getById(memberId);
+        User currentUser = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        communityService.removeMember(communityId, userToRemove, currentUser);
         return ResponseEntity.ok().build();
     }
-
 }

@@ -2,138 +2,116 @@ package com.example.meetexApi.service;
 
 import com.example.meetexApi.dto.community.CommunityRequestDTO;
 import com.example.meetexApi.dto.community.CommunityResponseDTO;
-import com.example.meetexApi.exception.BadRequestException;
-import com.example.meetexApi.exception.ResourceNotFoundException;
-import com.example.meetexApi.exception.UnauthorizedException;
+import com.example.meetexApi.exception.comment.CommentNotFoundException;
+import com.example.meetexApi.exception.post.UnauthorizedException;
+import com.example.meetexApi.mapper.CommunityMapper;
 import com.example.meetexApi.model.AuthenticatedUser;
 import com.example.meetexApi.model.Community;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.CommunityRepository;
 import com.example.meetexApi.repository.UserRepository;
+import com.example.meetexApi.validation.CommunityValidator;
 import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 @Transactional
 public class CommunityService {
     private final CommunityRepository communityRepository;
-
     private final UserRepository userRepository;
+    private final CommunityMapper communityMapper;
+    private final CommunityValidator communityValidator;
 
-    public CommunityService(CommunityRepository communityRepository, UserRepository userRepository) {
+    public CommunityService(CommunityRepository communityRepository, UserRepository userRepository, CommunityMapper communityMapper, CommunityValidator communityValidator) {
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
-    }
-    public Community save(Community community) {
-        return communityRepository.save(community);
-    }
-
-    public void delete(Community community) {
-        communityRepository.delete(community);
-    }
-    public Optional<Community> findById(Long id) {
-        return communityRepository.findById(id);
+        this.communityMapper = communityMapper;
+        this.communityValidator = communityValidator;
     }
 
+    /**
+     * @param communityRequestDTO
+     * @return DTO of new Community
+     */
     public CommunityResponseDTO createCommunity(CommunityRequestDTO communityRequestDTO) {
-        Community community = new Community();
-        community.setName(communityRequestDTO.getName());
-        community.setDescription(communityRequestDTO.getDescription());
-        community.setCategory(communityRequestDTO.getCategory());
-        community.setCreator(getCurrentUser());
-        community.setImageUrl(communityRequestDTO.getImageUrl());
+        communityValidator.createCommunityValidation(communityRequestDTO);
+
+        Community community = communityMapper.communityRequestDTOtoCommunity(communityRequestDTO);
 
         Community savedCommunity = communityRepository.save(community);
 
-        return toCommunityResponseDTO(savedCommunity);
+        return communityMapper.communityToCommunityResponseDTO(savedCommunity);
     }
 
-    public Community updateCommunity(Long communityId, CommunityRequestDTO communityRequestDTO, Long creatorId) {
-        return findById(communityId)
-                .map(community -> {
-                    if (community.getCreator().getId().equals(creatorId)) {
-                        community.setName(communityRequestDTO.getName());
-                        community.setDescription(communityRequestDTO.getDescription());
-                        community.setCategory(communityRequestDTO.getCategory());
-                        community.setImageUrl(communityRequestDTO.getImageUrl());
-                        return save(community);
-                    } else {
-                        throw new AccessDeniedException("You are not authorized to update this community.");
-                    }
-                })
-                .orElseThrow(() -> new OpenApiResourceNotFoundException("Community not found with ID: " + communityId));
-    }
-
-    public CommunityResponseDTO updateCommunity(Long communityId, CommunityRequestDTO communityRequestDTO, User currentUser) {
-        Community community = findById(communityId).orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
-
-        if (!community.getCreator().getId().equals(currentUser.getId())) {
-            throw new UnauthorizedException("You are not authorized to update this community");
-        }
-
-        community.setName(communityRequestDTO.getName());
-        Community updatedCommunity = save(community);
-
-        CommunityResponseDTO responseDTO = new CommunityResponseDTO();
-        responseDTO.setId(updatedCommunity.getId());
-        responseDTO.setName(updatedCommunity.getName());
-
-        return responseDTO;
-    }
-
-    public void deleteCommunity(Long communityId, User currentUser) {
-        Community community = findById(communityId).orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
-
-        if (!community.getCreator().getId().equals(currentUser.getId())) {
-            throw new UnauthorizedException("You are not authorized to delete this community");
-        }
-
-        delete(community);
-    }
-
-    public void addMember(Long communityId, User userToAdd, User currentUser) {
-        Community community = findById(communityId).orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
-
-        if (!community.getCreator().getId().equals(currentUser.getId())) {
-            throw new UnauthorizedException("You are not authorized to add members to this community");
-        }
-
-        community.getMembers().add(userToAdd);
-        save(community);
-    }
-
-    public void removeMember(Long communityId, Long memberId) {
+    /**
+     * @param communityId
+     * @return DTO of community with id = id
+     */
+    public CommunityResponseDTO findById(Long communityId) {
         Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
+                .orElseThrow(()->new CommentNotFoundException("Can not found community with id ="+communityId));
+        return communityMapper.communityToCommunityResponseDTO(community);
+    }
 
-        User member = userRepository.findById(memberId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + memberId));
+    /**
+     * @param communityId
+     * @param communityRequestDTO
+     * @return
+     */
+    public CommunityResponseDTO updateCommunity(Long communityId, CommunityRequestDTO communityRequestDTO) {
+        communityValidator.updateCommunityValidation(communityId, communityRequestDTO);
 
-        if (!community.getMembers().contains(member)) {
-            throw new BadRequestException("The specified user is not a member of this community.");
-        }
+        Community community = communityMapper.communityRequestDTOtoCommunity(communityRequestDTO);
 
-        community.getMembers().remove(member);
+        Community savedCommunity = communityRepository.save(community);
+
+        return communityMapper.communityToCommunityResponseDTO(savedCommunity);
+    }
+
+    /**
+     * @param communityId
+     * @param currentUser
+     */
+    public void deleteCommunity(Long communityId, User currentUser) {
+        communityRepository.delete(communityValidator.deleteCommunity(communityId, currentUser));
+    }
+
+    /**
+     * @param communityId
+     * @param userToAdd
+     * @param currentUser
+     * @return DTO of community which user was added
+     */
+    public CommunityResponseDTO addMember(Long communityId, User userToAdd, User currentUser) {
+        Community community = communityValidator.addAndRemoveMemberValidation(communityId, userToAdd, currentUser);
+        community.getMembers().add(userToAdd);
+
+        Community savedCommunity = communityRepository.save(community);
+        return communityMapper.communityToCommunityResponseDTO(savedCommunity);
+    }
+
+    /**
+     * @param communityId
+     * @param userToRemove
+     * @param currentUser
+     * @return DTO of community which user removed
+     */
+    public CommunityResponseDTO removeMember(Long communityId, User userToRemove, User currentUser) {
+        Community community = communityValidator.addAndRemoveMemberValidation(communityId, userToRemove, currentUser);
+        community.getMembers().remove(userToRemove);
+
         communityRepository.save(community);
+
+        Community savedCommunity = communityRepository.save(community);
+        return communityMapper.communityToCommunityResponseDTO(savedCommunity);
     }
 
-    public CommunityResponseDTO toCommunityResponseDTO(Community community) {
-        CommunityResponseDTO responseDTO = new CommunityResponseDTO();
-        responseDTO.setId(community.getId());
-        responseDTO.setName(community.getName());
-        responseDTO.setDescription(community.getDescription());
-        responseDTO.setCategory(community.getCategory());
-        responseDTO.setCreatorId(community.getCreator().getId());
-        responseDTO.setImageUrl(community.getImageUrl());
-        return responseDTO;
-    }
-
+    /**
+     * @return loggedUser
+     */
     private User getCurrentUser() {
         // Retrieve the currently logged-in user from the security context
         AuthenticatedUser authenticatedUser = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

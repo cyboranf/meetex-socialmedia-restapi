@@ -30,55 +30,51 @@ public class CommentController {
         this.userService = userService;
     }
 
+    /**
+     * @param postId
+     * @param commentRequestDTO
+     * @return DTO of new comment
+     */
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponseDTO> createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDTO commentRequestDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findUserByUserName(authentication.getName());
+        User currentUser = userService.getUserByUsername(authentication.getName());
 
-        Comment newComment = commentService.createComment(postId, commentRequestDTO, currentUser);
-        CommentResponseDTO commentResponseDTO = convertToCommentResponseDTO(newComment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDTO);
+        CommentResponseDTO newComment = commentService.createComment(commentRequestDTO, currentUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newComment);
     }
 
+    /**
+     * @param postId
+     * @return List of comments DTO under post with id = {postId}
+     */
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponseDTO>> getAllCommentsForPost(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getAllCommentsForPost(postId);
-        List<CommentResponseDTO> commentResponseDTOs = comments.stream()
-                .map(this::convertToCommentResponseDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(commentResponseDTOs);
+        List<CommentResponseDTO> comments = commentService.getAllCommentsForPost(postId);
+
+        return ResponseEntity.ok(comments);
     }
 
+    /**
+     * @param commentId
+     * @param commentUpdateRequest
+     * @return DTO of updated comment
+     */
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<CommentResponseDTO> updateComment(@PathVariable Long commentId, @Valid @RequestBody CommentUpdateRequestDTO commentUpdateRequest) {
-        Comment updatedComment = commentService.updateComment(commentId, commentUpdateRequest);
-        CommentResponseDTO commentResponseDTO = convertToCommentResponseDTO(updatedComment);
-        return ResponseEntity.ok(commentResponseDTO);
+        CommentResponseDTO updatedComment = commentService.updateComment(commentId, commentUpdateRequest);
+
+        return ResponseEntity.ok(updatedComment);
     }
 
+    /**
+     * @param commentId
+     * @return
+     */
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
-        commentService.deleteComment(commentId);
+        commentService.delete(commentId);
         return ResponseEntity.ok("Comment deleted successfully");
-    }
-
-    private CommentResponseDTO convertToCommentResponseDTO(Comment comment) {
-        CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
-        commentResponseDTO.setId(comment.getId());
-        commentResponseDTO.setText(comment.getText());
-        commentResponseDTO.setSendDate(comment.getSendDate());
-        commentResponseDTO.setSenderId(comment.getSender().getId());
-        commentResponseDTO.setPostId(comment.getPost().getId());
-        return commentResponseDTO;
-    }
-
-    private UserResponseDTO convertToUserResponseDTO(User user) {
-        UserResponseDTO userResponseDTO = new UserResponseDTO();
-        userResponseDTO.setId(user.getId());
-        userResponseDTO.setUserName(user.getUserName());
-        userResponseDTO.setEmail(user.getEmail());
-        userResponseDTO.setLastName(user.getLastName());
-
-        return userResponseDTO;
     }
 }

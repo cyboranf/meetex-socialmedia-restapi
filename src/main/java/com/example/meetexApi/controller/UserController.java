@@ -2,7 +2,6 @@ package com.example.meetexApi.controller;
 
 import com.example.meetexApi.dto.user.UserRequestDTO;
 import com.example.meetexApi.dto.user.UserResponseDTO;
-import com.example.meetexApi.model.User;
 import com.example.meetexApi.security.JwtTokenProvider;
 import com.example.meetexApi.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import com.example.meetexApi.dto.response.JwtAuthenticationResponse;
 import org.springframework.security.core.Authentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.validation.Valid;
 
 @RestController
@@ -37,16 +37,24 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * @param registrationRequest
+     * @return DTO of new user
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegistrationRequest registrationRequest) {
         try {
-            User newUser = userService.registerUser(registrationRequest);
-            UserResponseDTO userResponseDTO = convertToUserResponseDTO(newUser);
+            UserResponseDTO userResponseDTO = userService.registerUser(registrationRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }   }
+        }
+    }
 
+    /**
+     * @param loginRequest
+     * @return jwt
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest loginRequest) {
         try {
@@ -64,40 +72,25 @@ public class UserController {
         }
 
     }
+
+    /**
+     * @param userId
+     * @return DTO of user with id = @param
+     */
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
-        User user = userService.getUserById(userId);
-        UserResponseDTO userResponseDTO = convertToUserResponseDTO(user);
-        return ResponseEntity.ok(userResponseDTO);
+        UserResponseDTO user = userService.findById(userId);
+        return ResponseEntity.ok(user);
     }
 
+    /**
+     * @param userId
+     * @param userRequestDTO
+     * @return DTO of updated user
+     */
     @PutMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long userId, @Valid @RequestBody UserRequestDTO userRequestDTO) {
-        User userToUpdate = convertToUser(userRequestDTO);
-        User updatedUser = userService.updateUser(userId, userToUpdate);
-        UserResponseDTO userResponseDTO = convertToUserResponseDTO(updatedUser);
-        return ResponseEntity.ok(userResponseDTO);
+        UserResponseDTO updatedUser = userService.updateUser(userId, userRequestDTO);
+        return ResponseEntity.ok(updatedUser);
     }
-
-
-    private UserResponseDTO convertToUserResponseDTO(User user) {
-        UserResponseDTO userResponseDTO = new UserResponseDTO();
-        userResponseDTO.setId(user.getId());
-        userResponseDTO.setUserName(user.getUserName());
-        userResponseDTO.setEmail(user.getEmail());
-        userResponseDTO.setLastName(user.getLastName());
-
-        return userResponseDTO;
-    }
-    private User convertToUser(UserRequestDTO userRequestDTO) {
-        User user = new User();
-        user.setUserName(userRequestDTO.getUserName());
-        user.setUserName(userRequestDTO.getUserName());
-        user.setLastName(userRequestDTO.getLastName());
-        user.setEmail(userRequestDTO.getEmail());
-
-        return user;
-    }
-
-
 }

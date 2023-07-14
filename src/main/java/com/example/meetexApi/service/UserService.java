@@ -59,6 +59,10 @@ public class UserService {
         return userMapper.userToUserResponseDTO(savedUser);
     }
 
+    public UserResponseDTO findById(Long id) {
+        return userMapper.userToUserResponseDTO(userValidator.validateUserExists(id));
+    }
+
     /**
      * @param id
      * @param userRequestDTO
@@ -76,6 +80,10 @@ public class UserService {
         User savedUser = userRepository.save(updatingUser);
 
         return userMapper.userToUserResponseDTO(savedUser);
+    }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findUserByUserName(username);
     }
 
     /**

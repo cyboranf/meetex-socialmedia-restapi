@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ActivityMapper {
     ActivityMapper INSTANCE = Mappers.getMapper(ActivityMapper.class);
 
@@ -16,7 +16,7 @@ public interface ActivityMapper {
     @Mapping(target = "activities_id", ignore = true)
     @Mapping(target = "description", ignore = true)
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "iamgeUrl", ignore = true)
+    @Mapping(target = "imageUrl", ignore = true)
     @Mapping(target = "users", ignore = true)
     Activity activityRequestDTOtoActivity(ActivityRequestDTO activityRequestDTO);
 }

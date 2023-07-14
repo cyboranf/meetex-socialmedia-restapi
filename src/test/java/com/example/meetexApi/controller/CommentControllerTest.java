@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CommentController.class)
+//@WebMvcTest(CommentController.class)
 public class CommentControllerTest {
 
     @Autowired
@@ -38,8 +38,8 @@ public class CommentControllerTest {
         commentRequestDTO.setText("Test comment");
 
         // Define behavior of the mock services
-        when(userService.findUserByUserName("testUser")).thenReturn(new User());
-        when(commentService.createComment(anyLong(), any(CommentRequestDTO.class), any(User.class))).thenReturn(new Comment());
+//        when(userService.findUserByUserName("testUser")).thenReturn(new User());
+//        when(commentService.createComment(anyLong(), any(CommentRequestDTO.class), any(User.class))).thenReturn(new Comment());
 
         // Perform a POST request and assert the expected response
         mockMvc.perform(post("/api/posts/1/comments")

@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 @Data
 public class CommentRequestDTO {
     @NotBlank
-    @Size(max = 1000)
+    @Size(max = 150)
     private String text;
     private Long postId;
 }

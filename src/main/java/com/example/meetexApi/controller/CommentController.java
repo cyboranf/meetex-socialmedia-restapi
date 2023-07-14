@@ -3,8 +3,7 @@ package com.example.meetexApi.controller;
 import com.example.meetexApi.dto.comment.CommentRequestDTO;
 import com.example.meetexApi.dto.comment.CommentResponseDTO;
 import com.example.meetexApi.dto.comment.CommentUpdateRequestDTO;
-import com.example.meetexApi.dto.user.UserResponseDTO;
-import com.example.meetexApi.model.Comment;
+
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.service.CommentService;
 import com.example.meetexApi.service.UserService;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api")

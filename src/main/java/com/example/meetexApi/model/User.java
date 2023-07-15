@@ -1,5 +1,6 @@
 package com.example.meetexApi.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,13 +9,12 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @Table(name = "user")
 public class User {
     @Id
@@ -51,8 +51,12 @@ public class User {
     private int notCount;
     private boolean active;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<Role> roles;
 
     @ManyToMany(mappedBy = "members")
@@ -75,4 +79,7 @@ public class User {
             joinColumns = @JoinColumn(name = "receiver_id"),
             inverseJoinColumns = @JoinColumn(name = "sender_id"))
     private List<User> receivedFriendRequests;
+    public User() {
+        roles = new HashSet<>();
+    }
 }

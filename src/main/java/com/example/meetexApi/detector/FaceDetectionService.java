@@ -2,14 +2,16 @@ package com.example.meetexApi.detector;
 
 import org.opencv.core.*;
 import org.opencv.objdetect.CascadeClassifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.IOException;
 import java.util.List;
 
-@Service
+
 public class FaceDetectionService {
     private CascadeClassifier faceDetector;
 

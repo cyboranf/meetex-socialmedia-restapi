@@ -1,8 +1,8 @@
 package com.example.meetexApi.dto.community;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 
 @Data
 public class MemberRequestDTO {

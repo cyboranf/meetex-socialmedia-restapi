@@ -3,12 +3,12 @@ package com.example.meetexApi.controller;
 import com.example.meetexApi.dto.friendRequest.FriendRequestDTO;
 import com.example.meetexApi.dto.user.UserResponseDTO;
 import com.example.meetexApi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Validated

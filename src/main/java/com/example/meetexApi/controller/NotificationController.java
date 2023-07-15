@@ -3,10 +3,10 @@ package com.example.meetexApi.controller;
 import com.example.meetexApi.dto.notification.NotificationRequestDTO;
 import com.example.meetexApi.dto.notification.NotificationResponseDTO;
 import com.example.meetexApi.service.NotificationService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController

@@ -7,13 +7,14 @@ import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.UserRepository;
 import com.example.meetexApi.service.CommunityService;
 import com.example.meetexApi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api")

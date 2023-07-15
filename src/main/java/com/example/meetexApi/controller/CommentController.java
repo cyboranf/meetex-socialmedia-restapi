@@ -7,13 +7,13 @@ import com.example.meetexApi.dto.comment.CommentUpdateRequestDTO;
 import com.example.meetexApi.model.User;
 import com.example.meetexApi.service.CommentService;
 import com.example.meetexApi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 

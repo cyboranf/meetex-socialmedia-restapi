@@ -4,21 +4,16 @@ import com.example.meetexApi.dto.user.UserRequestDTO;
 import com.example.meetexApi.dto.user.UserResponseDTO;
 import com.example.meetexApi.security.JwtTokenProvider;
 import com.example.meetexApi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.example.meetexApi.dto.user.UserRegistrationRequest;
-import com.example.meetexApi.dto.user.UserLoginRequest;
-import com.example.meetexApi.dto.response.JwtAuthenticationResponse;
-import org.springframework.security.core.Authentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -51,27 +46,6 @@ public class UserController {
         }
     }
 
-    /**
-     * @param loginRequest
-     * @return jwt
-     */
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jwtTokenProvider.generateToken(authentication);
-            return ResponseEntity.ok(new JwtAuthenticationResponse(token));
-        } catch (AuthenticationException e) {
-            logger.error("Error during authentication", e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-        } catch (Exception e) {
-            logger.error("Unexpected error during login", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing your request");
-        }
-
-    }
 
     /**
      * @param userId

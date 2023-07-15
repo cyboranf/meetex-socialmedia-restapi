@@ -41,8 +41,6 @@ public class UserService {
     private final UserValidator userValidator;
     private final UserMapper userMapper;
 
-    @Autowired
-    private Gmail gmailService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, UserValidator userValidator, UserMapper userMapper) {
         this.userRepository = userRepository;
@@ -65,13 +63,10 @@ public class UserService {
         newUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
 
         // Assign a default role to the user
-        Role defaultRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new RoleNotFoundException("Default user role not found."));
+        Role defaultRole = roleRepository.findByName("USER").orElseThrow(() -> new RoleNotFoundException("Default user role not found."));
         newUser.setRoles(Collections.singleton(defaultRole));
 
         User savedUser = userRepository.save(newUser);
-
-//        javax.mail.Message welcomeMessage = createWelcomeMessage(savedUser.getEmail(), savedUser.getUserName());
-//        gmailService.users().messages().send("me", welcomeMessage).execute();
 
 
         return userMapper.userToUserResponseDTO(savedUser);

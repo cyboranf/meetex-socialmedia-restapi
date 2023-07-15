@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -28,6 +29,6 @@ public class Activity {
     @Column
     private String imageUrl;
 
-    @ManyToMany(mappedBy = "interests")
-    private Set<User> users;
+    @ManyToMany(mappedBy = "activities")
+    private Set<User> users = new HashSet<>();
 }

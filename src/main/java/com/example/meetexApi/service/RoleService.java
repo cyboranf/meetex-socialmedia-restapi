@@ -1,5 +1,6 @@
 package com.example.meetexApi.service;
 
+import com.example.meetexApi.exception.user.RoleNotFoundException;
 import com.example.meetexApi.model.Role;
 import com.example.meetexApi.repository.RoleRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,8 @@ public class RoleService {
      * @param id
      * @return
      */
-    public Optional<Role> findById(Long id) {
-        return roleRepository.findById(id);
+    public Role findById(Long id) {
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new RoleNotFoundException("Can not found role with id = " + id));
     }
 }

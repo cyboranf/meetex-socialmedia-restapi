@@ -58,14 +58,15 @@ public class User {
     )
     private Set<Role> roles;
 
-    @ManyToMany(mappedBy = "members")
-    private Set<Community> communities;
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<Community> communities = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "user_activities",
+    @ManyToMany(cascade = CascadeType.ALL)
+    @Nullable
+    @JoinTable(name = "user_activity",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "activities_id"))
-    private Set<Activity> interests;
+            inverseJoinColumns = @JoinColumn(name = "activity_id"))
+    private Set<Activity> activities = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinTable(name = "sent_friend_requests",

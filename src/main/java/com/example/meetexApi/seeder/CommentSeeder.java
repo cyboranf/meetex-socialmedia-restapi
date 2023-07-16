@@ -1,8 +1,6 @@
 package com.example.meetexApi.seeder;
 
 import com.example.meetexApi.model.Comment;
-import com.example.meetexApi.model.Post;
-import com.example.meetexApi.model.User;
 import com.example.meetexApi.repository.CommentRepository;
 import com.example.meetexApi.repository.PostRepository;
 import com.example.meetexApi.repository.UserRepository;

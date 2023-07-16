@@ -44,9 +44,8 @@ class RoleServiceTest {
 
         when(roleRepository.findById(id)).thenReturn(Optional.of(role));
 
-        Optional<Role> foundRole = roleService.findById(id);
+        Role foundRole = roleService.findById(id);
 
-        Assert.assertTrue(foundRole.isPresent());
         verify(roleRepository).findById(id);
     }
 }

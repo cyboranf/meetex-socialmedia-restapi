@@ -33,21 +33,6 @@ public class UserController {
     }
 
     /**
-     * @param registrationRequest
-     * @return DTO of new user
-     */
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegistrationRequest registrationRequest) {
-        try {
-            UserResponseDTO userResponseDTO = userService.registerUser(registrationRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-
-    /**
      * @param userId
      * @return DTO of user with id = @param
      */
